@@ -1,0 +1,11 @@
+[package]
+name = "pqs_text_crypto"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+oqs = { version = "0.11.0", features = ["vendored"] }
+oqs-sys = { version = "0.11.0", features = ["vendored"] }
+
+aes-gcm = "0.10.3"          # AES-GCM encryption
+rand = "0.9.2"              # Random number generator

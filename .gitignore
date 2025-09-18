@@ -1,0 +1,18 @@
+# Ignore target folder (compiled binaries, intermediate files)
+/target/
+
+# Ignore project-specific Cargo config
+.cargo/config.toml
+
+# Ignore build artifacts
+**/*.rs.bk
+**/*.rmeta
+**/*.rlib
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore editor configs (optional)
+.vscode/
+.idea/
