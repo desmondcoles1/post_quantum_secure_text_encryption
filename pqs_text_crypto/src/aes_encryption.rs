@@ -7,7 +7,6 @@ use aes_gcm::aead::generic_array::typenum::U12;
 
 pub fn aes_encrypt_file(text: &[u8]) -> Result<(Vec<u8>, Nonce<U12>, Key<Aes256Gcm>),aes_gcm::Error>  {
     let key = Aes256Gcm::generate_key(OsRng);
-    let cipher = Aes256Gcm::new(&key);
     let nonce = Aes256Gcm::generate_nonce(&mut OsRng);
     let cipher = Aes256Gcm::new(&key);
 
@@ -31,4 +30,3 @@ fn files_are_equal(path1: &str, path2: &str) -> std::io::Result<bool> {
     let file2 = fs::read(path2)?;
     Ok(file1 == file2)
 }
-//this file is totally busted
