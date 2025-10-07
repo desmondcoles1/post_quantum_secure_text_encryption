@@ -12,3 +12,10 @@
 **/*.rmeta
 **/*.rlib
 
+# system stuff
+.DS_Store
+Thumbs.db
+
+#vs code stuff
+.vscode/
+
