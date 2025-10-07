@@ -1,18 +1,14 @@
 # Ignore target folder (compiled binaries, intermediate files)
-/target/
+post_quantum_secure_text_encryption/target/
 
 # Ignore project-specific Cargo config
-.cargo/config.toml
+post_quantum_secure_text_encryption/.cargo/config.toml
+
+#ignore test files
+post_quantum_secure_text_encryption/test_files/
 
 # Ignore build artifacts
 **/*.rs.bk
 **/*.rmeta
 **/*.rlib
 
-# Ignore OS files
-.DS_Store
-Thumbs.db
-
-# Ignore editor configs (optional)
-.vscode/
-.idea/
