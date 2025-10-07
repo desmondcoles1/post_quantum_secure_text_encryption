@@ -5,7 +5,7 @@
 /pqs_text_crypto/.cargo/config.toml
 
 #ignore test files
-/pqs_text_crypto/test_files/
+/test_files/
 
 # Ignore build artifacts
 **/*.rs.bk
