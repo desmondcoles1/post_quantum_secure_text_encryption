@@ -2,6 +2,8 @@ mod kyber_keypair_generation; //keypair generation module
 mod file_encryption; //file encryption module
 mod file_decryption; //file decryption module
 
+mod error_handling;
+
 use oqs::*;
 
 

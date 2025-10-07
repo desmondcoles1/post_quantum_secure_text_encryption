@@ -8,31 +8,31 @@ use aes_gcm::{
     Aes256Gcm
 };
 
+use crate::error_handling::CryptoError;
 
 
+pub fn message_encryption(recipient_public_key: &[u8], text: &[u8]) -> std::result::Result<(), CryptoError> {
+    let kem = kem::Kem::new(kem::Algorithm::Kyber512)?;
 
-pub fn message_encryption(recipient_public_key: &[u8], text: &[u8]) -> Result<()> {
-    let kem = kem::Kem::new(kem::Algorithm::Kyber512).expect("Failed to create KEM instance");
-
-    let recipient_public_key_corrected = kem.public_key_from_bytes(&recipient_public_key).expect("Failed to create public key from bytes");
+    let recipient_public_key_corrected = kem.public_key_from_bytes(&recipient_public_key).ok_or(CryptoError::InvalidInput)?;
 
 
     let (encrypted_secret_symmetric_key, secret_symmetric_key) = kem.encapsulate(&recipient_public_key_corrected)?;
 
     let secret_symmetric_key_in_bytes: &[u8] = secret_symmetric_key.as_ref();
-    let cipher = Aes256Gcm::new_from_slice(&secret_symmetric_key_in_bytes).expect("Failed to create cipher from key");
+    let cipher = Aes256Gcm::new_from_slice(&secret_symmetric_key_in_bytes)?;
 
 
     let nonce = Aes256Gcm::generate_nonce(&mut OsRng);
-    let encrypted_text_raw = cipher.encrypt(&nonce, &*text).expect("Encryption failed");  
+    let encrypted_text_raw = cipher.encrypt(&nonce, &*text)?;  
 
 
     let mut encrypted_message = Vec::with_capacity(nonce.len() + encrypted_text_raw.len());
     encrypted_message.extend_from_slice(&nonce);          
     encrypted_message.extend_from_slice(&encrypted_text_raw); 
   
-    fs::write("../enecrypted_message.bin", &encrypted_message).expect("Failed to write encrypted text to file oh nooOOOoOOoo :(((999((" );
-    fs::write("../encrypted_secret_symmetric_key.bin", &encrypted_secret_symmetric_key).expect("Failed to encrypted symmetric key text to file");
+    fs::write("../enecrypted_message.bin", &encrypted_message)?;
+    fs::write("../encrypted_secret_symmetric_key.bin", &encrypted_secret_symmetric_key)?;
 
     Ok(())
 
@@ -41,39 +41,39 @@ pub fn message_encryption(recipient_public_key: &[u8], text: &[u8]) -> Result<()
 
 
 
-pub fn file_encryption_prompt() -> Result<()>{
+pub fn file_encryption_prompt() -> std::result::Result<(), CryptoError>{
     let mut input = String::new(); 
     println!("Would you like to encrypt a file to be sent? (y/n):");
-    io::stdout().flush().unwrap(); // make sure prompt appears
-    io::stdin().read_line(&mut input).expect("Error, cannot read input");
+    io::stdout().flush()?; // make sure prompt appears
+    io::stdin().read_line(&mut input)?;
     match input.trim().to_lowercase().as_str() {
         "y" | "yes" => {
             // Prompt user
             print!("Paste the file path: ");
-            io::stdout().flush().unwrap();
+            io::stdout().flush()?;
 
             // Read message path
             let mut message_path = String::new();
-            io::stdin().read_line(&mut message_path).unwrap();
+            io::stdin().read_line(&mut message_path)?;
             let message_path = message_path.trim();
 
             // Read files
-            let text = fs::read(message_path).unwrap();
+            let text = fs::read(message_path)?;
 
             // Prompt user
             print!("Paste the path to the public key of your recipient: ");
-            io::stdout().flush().unwrap();
+            io::stdout().flush()?;
 
             // Read key path
             let mut key_path = String::new();
-            io::stdin().read_line(&mut key_path).unwrap();
+            io::stdin().read_line(&mut key_path)?;
             let key_path = key_path.trim();
 
             //read key
-            let recipient_public_key = fs::read(key_path).unwrap();
+            let recipient_public_key = fs::read(key_path)?;
 
             //encrypt the message
-            message_encryption(&recipient_public_key, &text).expect("message encryption failed :(((");
+            message_encryption(&recipient_public_key, &text)?;
             Ok(())
         }
         "n" | "no" => {
