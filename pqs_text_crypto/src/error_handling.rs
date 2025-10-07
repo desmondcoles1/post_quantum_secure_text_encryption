@@ -6,13 +6,13 @@ use std::io;
 
 #[derive(Error, Debug)]
 pub enum CryptoError {
-    #[error("AES invalid key length: {0}")]
+    #[error("AES invalid key length")]
     InvalidAesKeyLength(String),
 
-    #[error("AES encryption/decryption failed: {0}")]
+    #[error("AES encryption/decryption failed")]
     AesError(String),
 
-    #[error("File IO error")]
+    #[error("Error reading or writing a file")]
     IoError(#[from] io::Error),
 
     #[error("Invalid input provided")]
