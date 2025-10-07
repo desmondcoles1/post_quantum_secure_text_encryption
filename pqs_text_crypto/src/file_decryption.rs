@@ -1,113 +1,115 @@
 use std::fs;
 use std::io::{self, Write};
 
-//kyber stuff
-
-mod kyber_key_crypto; //kyber module
-
 use oqs::*;
 
-//for aes stuff
-
-mod aes_encryption; //aes module
 
 use aes_gcm::{
-    aead::{Aead, AeadCore, KeyInit, OsRng},
-    Aes256Gcm, Key, Nonce
+    aead::{Aead, KeyInit},
+    Aes256Gcm,
 };
 
-use aes_gcm::aead::generic_array::typenum::U12;
-use aes_gcm::aead::generic_array::typenum::U32;
-
-use generic_array::GenericArray;
-fn main() -> Result<()>{
-
-    //Prompt user
-    let mut input = String::new(); 
-    println!("Would you like to deencrypt a file that you recieved? (y/n):");
-    io::stdout().flush().unwrap(); // make sure prompt appears
-    io::stdin().read_line(&mut input).expect("Error, cannot read input");
-    let answer = input.trim().to_lowercase();
-    match input.trim().to_lowercase().as_str() {
-        "y" | "yes" => {
-            // Just continue
-        }
-        "n" | "no" => {
-            std::process::exit(0); // stop the program
-        }
-        _ => {
-            println!("Invalid input, please enter y/n");
-        }
-    }
-
-    // Prompt user
-    print!("Paste the encrypted file path: ");
-    io::stdout().flush().unwrap();
-
-    // Read encrypted path
-    let mut encrypted_message_path = String::new();
-    io::stdin().read_line(&mut encrypted_message_path).unwrap();
-    let encrypted_message_path = encrypted_message_path.trim();
-
-    //read in encrypted text
-    let encrypted_text = fs::read(encrypted_message_path).unwrap();
-
-    /////////////////////////////////
-
-    // Prompt user
-    print!("Paste your private key path: ");
-    io::stdout().flush().unwrap();
-
-    // read private key path
-    let mut private_key_path = String::new();
-    io::stdin().read_line(&mut private_key_path).unwrap();
-    let private_key_path = private_key_path.trim();
-
-    // read in private key
-    let private_key = fs::read(private_key_path).unwrap();
-
-    //////////////////////////////////
-    
-    // Prompt user
-    print!("Paste the path to your encrypted symmetric key: ");
-    io::stdout().flush().unwrap();
 
 
-    // Read the secret key path
-    let mut encrypted_symmetric_key_path = String::new();
-    io::stdin().read_line(&mut encrypted_symmetric_key_path).unwrap();
-    let private_key_path = private_key_path.trim();   
-
-    // read in encrypted symmetric key  
-    let encrypted_symmetric_key = fs::read(encrypted_symmetric_key_path).unwrap();
-
-    /////////////////////////////////  
-
-    // Prompt user
-    print!("Paste the path to the nonce: ");
-    io::stdout().flush().unwrap();
-
-    // read nonce path
-    let mut nonce_path = String::new();
-    io::stdin().read_line(&mut nonce_path).unwrap();
-    let nonce_path = nonce_path.trim();      
-
-    // read in nonce    
-    let nonce = fs::read(nonce_path).unwrap();  
-
-    //////////// decrypt symmetric key
-     
+pub fn message_decryption(private_key: &[u8], encrypted_symmetric_key: &[u8], nonce: &[u8], encrypted_text: &[u8]) -> Result<()> {
     let kem = kem::Kem::new(kem::Algorithm::Kyber512)?;
 
-    let secret_aes_key = kemalg.decapsulate(&private_key, &encrypted_symmetric_key)?;
+    let private_key_corrected = kem.secret_key_from_bytes(&private_key).expect("Failed to create private key from bytes");
 
-    let aes_cipher = Aes256Gcm::new(secret_aes_key);
-    let plaintext = cipher.decrypt(nonce, encrypted_text)?;
+    let encrypted_symmetric_key_corrected = kem.ciphertext_from_bytes(&encrypted_symmetric_key).expect("Failed to create e symmetric key from bytes");
 
+    let secret_aes_key = kem.decapsulate(&private_key_corrected, &encrypted_symmetric_key_corrected)?;
 
-    let text_decrypted = String::from_utf8(decrypted_bytes)?;
-    println!("Decrypted text: {}", plaintext);
+    let secret_aes_key_in_bytes: &[u8] = secret_aes_key.as_ref();
+
+    let aes_cipher = Aes256Gcm::new_from_slice(&secret_aes_key_in_bytes).expect("Failed to create cipher from key");
+
+    let nonce_in_bytes: &[u8] = nonce.as_ref();
+    let nonce = aes_gcm::Nonce::from_slice(&nonce_in_bytes); // &Nonce
+
+    let decrypted_bytes: Vec<u8> = aes_cipher.decrypt(nonce, encrypted_text.as_ref()).unwrap();
+
+    println!("Decrypted bytes: {:?}", decrypted_bytes);
+
+    //let text_decrypted_once = String::from_utf8(decrypted_bytes?);
+    //let text_decrypted: Vec<u8> = text_decrypted_once.unwrap().into();
+    //println!("Decrypted text: {}", text_decrypted);
+
+    fs::write("../decrypted_text.txt", &decrypted_bytes).expect("Failed to write decrypted text to file");
 
     Ok(())
 
+
+}
+
+
+pub fn file_decryption_prompt() -> Result<()>{
+    let mut input = String::new(); 
+    println!("Would you like to decrypt a file you recieved? (y/n):");
+    io::stdout().flush().unwrap(); // make sure prompt appears
+    io::stdin().read_line(&mut input).expect("Error, cannot read input");
+    match input.trim().to_lowercase().as_str() {
+        "y" | "yes" => {
+            // Prompt user
+            print!("Paste the file path: ");
+            io::stdout().flush().unwrap();
+
+            // Read message path
+            let mut message_path = String::new();
+            io::stdin().read_line(&mut message_path).unwrap();
+            let message_path = message_path.trim();
+
+            // Read files
+            let text = fs::read(message_path).unwrap();
+
+            // Prompt user
+            print!("Paste the path to your private key");
+            io::stdout().flush().unwrap();
+
+            // Read key path
+            let mut key_path = String::new();
+            io::stdin().read_line(&mut key_path).unwrap();
+            let key_path = key_path.trim();
+
+            //read key
+            let private_key = fs::read(key_path).unwrap();
+
+            // Prompt user
+            print!("Paste the path to your encrypted symmetric key: ");
+            io::stdout().flush().unwrap();
+
+
+            // Read the secret key path
+            let mut encrypted_symmetric_key_path = String::new();
+            io::stdin().read_line(&mut encrypted_symmetric_key_path).unwrap();
+            let encrypted_symmetric_key_path = encrypted_symmetric_key_path.trim();   
+
+            // read in encrypted symmetric key  
+            let encrypted_symmetric_key = fs::read(encrypted_symmetric_key_path).unwrap();
+
+            // Prompt user
+            print!("Paste the path to the nonce: ");
+            io::stdout().flush().unwrap();
+
+            // read nonce path
+            let mut nonce_path = String::new();
+            io::stdin().read_line(&mut nonce_path).unwrap();
+            let nonce_path = nonce_path.trim();      
+
+            // read in nonce    
+            let nonce = fs::read(nonce_path).unwrap();  
+
+            //decrypt the message
+            message_decryption(&private_key, &encrypted_symmetric_key, &nonce, &text).expect("message encryption failed :(((");
+            Ok(())
+        }
+        "n" | "no" => {
+            // do nothing, just continue
+            Ok(())
+        }
+        _ => {
+            println!("Invalid input, please enter y/n");
+            Ok(())
+        }
+    }
 }
