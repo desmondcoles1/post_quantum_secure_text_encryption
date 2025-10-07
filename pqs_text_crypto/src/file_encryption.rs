@@ -24,10 +24,14 @@ pub fn message_encryption(recipient_public_key: &[u8], text: &[u8]) -> Result<()
 
 
     let nonce = Aes256Gcm::generate_nonce(&mut OsRng);
-    let encrypted_text = cipher.encrypt(&nonce, &*text).expect("Encryption failed");  
+    let encrypted_text_raw = cipher.encrypt(&nonce, &*text).expect("Encryption failed");  
+
+
+    let mut encrypted_message = Vec::with_capacity(nonce.len() + encrypted_text_raw.len());
+    encrypted_message.extend_from_slice(&nonce);          
+    encrypted_message.extend_from_slice(&encrypted_text_raw); 
   
-    fs::write("../enecrypted_text.bin", &encrypted_text).expect("Failed to write encrypted text to file oh nooOOOoOOoo :(((999((" );
-    fs::write("../nonce.bin", &nonce).expect("Failed to write nonce to file");
+    fs::write("../enecrypted_message.bin", &encrypted_message).expect("Failed to write encrypted text to file oh nooOOOoOOoo :(((999((" );
     fs::write("../encrypted_secret_symmetric_key.bin", &encrypted_secret_symmetric_key).expect("Failed to encrypted symmetric key text to file");
 
     Ok(())

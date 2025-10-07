@@ -29,12 +29,6 @@ pub fn message_decryption(private_key: &[u8], encrypted_symmetric_key: &[u8], no
 
     let decrypted_bytes: Vec<u8> = aes_cipher.decrypt(nonce, encrypted_text.as_ref()).unwrap();
 
-    println!("Decrypted bytes: {:?}", decrypted_bytes);
-
-    //let text_decrypted_once = String::from_utf8(decrypted_bytes?);
-    //let text_decrypted: Vec<u8> = text_decrypted_once.unwrap().into();
-    //println!("Decrypted text: {}", text_decrypted);
-
     fs::write("../decrypted_text.txt", &decrypted_bytes).expect("Failed to write decrypted text to file");
 
     Ok(())
@@ -51,7 +45,7 @@ pub fn file_decryption_prompt() -> Result<()>{
     match input.trim().to_lowercase().as_str() {
         "y" | "yes" => {
             // Prompt user
-            print!("Paste the file path: ");
+            print!("Paste the path to the encrypted message: ");
             io::stdout().flush().unwrap();
 
             // Read message path
@@ -60,7 +54,11 @@ pub fn file_decryption_prompt() -> Result<()>{
             let message_path = message_path.trim();
 
             // Read files
-            let text = fs::read(message_path).unwrap();
+            let encrypted_message = fs::read(message_path).unwrap();
+
+        
+            // Split the nonce and ciphertext
+            let (nonce, encrypted_text) = encrypted_message.split_at(12);
 
             // Prompt user
             print!("Paste the path to your private key");
@@ -87,20 +85,8 @@ pub fn file_decryption_prompt() -> Result<()>{
             // read in encrypted symmetric key  
             let encrypted_symmetric_key = fs::read(encrypted_symmetric_key_path).unwrap();
 
-            // Prompt user
-            print!("Paste the path to the nonce: ");
-            io::stdout().flush().unwrap();
-
-            // read nonce path
-            let mut nonce_path = String::new();
-            io::stdin().read_line(&mut nonce_path).unwrap();
-            let nonce_path = nonce_path.trim();      
-
-            // read in nonce    
-            let nonce = fs::read(nonce_path).unwrap();  
-
             //decrypt the message
-            message_decryption(&private_key, &encrypted_symmetric_key, &nonce, &text).expect("message encryption failed :(((");
+            message_decryption(&private_key, &encrypted_symmetric_key, &nonce, &encrypted_text).expect("message encryption failed :(((");
             Ok(())
         }
         "n" | "no" => {
