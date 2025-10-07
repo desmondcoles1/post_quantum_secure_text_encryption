@@ -1,11 +1,11 @@
 # Ignore target folder (compiled binaries, intermediate files)
-post_quantum_secure_text_encryption/target/
+/pqs_text_crypto/target/
 
 # Ignore project-specific Cargo config
-post_quantum_secure_text_encryption/.cargo/config.toml
+/pqs_text_crypto/.cargo/config.toml
 
 #ignore test files
-post_quantum_secure_text_encryption/test_files/
+/pqs_text_crypto/test_files/
 
 # Ignore build artifacts
 **/*.rs.bk
