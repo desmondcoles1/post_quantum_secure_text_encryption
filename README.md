@@ -1,4 +1,4 @@
-# Message exchange with post-quantum secure public key encryption
+## Message exchange with post-quantum secure public key encryption
 
 Many use cases of cryptography in day-to-day life fall under the umbrella of public key cryptography. Public key cryptography allows a person to publish a "public key" which others can use to encrypt a message to them, and when the message is recieved the original user has a private key that be used to decrypt the message, only their private key can be used for this, and as a result nobody that intercepts the message can read it. This allows real-time secure commnication between different parties over the internet.
 
