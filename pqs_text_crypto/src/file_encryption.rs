@@ -42,47 +42,31 @@ pub fn message_encryption(recipient_public_key: &[u8], text: &[u8]) -> std::resu
 
 
 pub fn file_encryption_prompt() -> std::result::Result<(), CryptoError>{
-    let mut input = String::new(); 
-    println!("Would you like to encrypt a file to be sent? (y/n):");
-    io::stdout().flush()?; // make sure prompt appears
-    io::stdin().read_line(&mut input)?;
-    match input.trim().to_lowercase().as_str() {
-        "y" | "yes" => {
-            // Prompt user
-            print!("Paste the file path: ");
-            io::stdout().flush()?;
+        // Prompt user
+        print!("Paste the file path: ");
+        io::stdout().flush()?;
 
-            // Read message path
-            let mut message_path = String::new();
-            io::stdin().read_line(&mut message_path)?;
-            let message_path = message_path.trim();
+        // Read message path
+        let mut message_path = String::new();
+        io::stdin().read_line(&mut message_path)?;
+        let message_path = message_path.trim();
 
-            // Read files
-            let text = fs::read(message_path)?;
+        // Read files
+        let text = fs::read(message_path)?;
 
-            // Prompt user
-            print!("Paste the path to the public key of your recipient: ");
-            io::stdout().flush()?;
+        // Prompt user
+        print!("Paste the path to the public key of your recipient: ");
+        io::stdout().flush()?;
 
-            // Read key path
-            let mut key_path = String::new();
-            io::stdin().read_line(&mut key_path)?;
-            let key_path = key_path.trim();
+        // Read key path
+        let mut key_path = String::new();
+        io::stdin().read_line(&mut key_path)?;
+        let key_path = key_path.trim();
 
-            //read key
-            let recipient_public_key = fs::read(key_path)?;
+        //read key
+        let recipient_public_key = fs::read(key_path)?;
 
-            //encrypt the message
-            message_encryption(&recipient_public_key, &text)?;
-            Ok(())
-        }
-        "n" | "no" => {
-            // do nothing, just continue
-            Ok(())
-        }
-        _ => {
-            println!("Invalid input, please enter y/n");
-            Ok(())
-        }
-    }
+        //encrypt the message
+        message_encryption(&recipient_public_key, &text)?;
+        Ok(())
 }

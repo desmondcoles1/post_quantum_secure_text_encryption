@@ -39,64 +39,48 @@ pub fn message_decryption(private_key: &[u8], encrypted_symmetric_key: &[u8], no
 
 
 pub fn file_decryption_prompt() -> std::result::Result<(), CryptoError>{
-    let mut input = String::new(); 
-    println!("Would you like to decrypt a file you recieved? (y/n):");
-    io::stdout().flush()?; // make sure prompt appears
-    io::stdin().read_line(&mut input)?;
-    match input.trim().to_lowercase().as_str() {
-        "y" | "yes" => {
-            // Prompt user
-            print!("Paste the path to the encrypted message: ");
-            io::stdout().flush()?;
+        // Prompt user
+        print!("Paste the path to the encrypted message: ");
+        io::stdout().flush()?;
 
-            // Read message path
-            let mut message_path = String::new();
-            io::stdin().read_line(&mut message_path)?;
-            let message_path = message_path.trim();
+        // Read message path
+        let mut message_path = String::new();
+        io::stdin().read_line(&mut message_path)?;
+        let message_path = message_path.trim();
 
-            // Read files
-            let encrypted_message = fs::read(message_path)?;
+        // Read files
+        let encrypted_message = fs::read(message_path)?;
 
-        
-            // Split the nonce and ciphertext
-            let (nonce, encrypted_text) = encrypted_message.split_at(12);
+    
+        // Split the nonce and ciphertext
+        let (nonce, encrypted_text) = encrypted_message.split_at(12);
 
-            // Prompt user
-            print!("Paste the path to your private key");
-            io::stdout().flush()?;
+        // Prompt user
+        print!("Paste the path to your private key");
+        io::stdout().flush()?;
 
-            // Read key path
-            let mut key_path = String::new();
-            io::stdin().read_line(&mut key_path)?;
-            let key_path = key_path.trim();
+        // Read key path
+        let mut key_path = String::new();
+        io::stdin().read_line(&mut key_path)?;
+        let key_path = key_path.trim();
 
-            //read key
-            let private_key = fs::read(key_path)?;
+        //read key
+        let private_key = fs::read(key_path)?;
 
-            // Prompt user
-            print!("Paste the path to your encrypted symmetric key: ");
-            io::stdout().flush()?;
+        // Prompt user
+        print!("Paste the path to your encrypted symmetric key: ");
+        io::stdout().flush()?;
 
 
-            // Read the secret key path
-            let mut encrypted_symmetric_key_path = String::new();
-            io::stdin().read_line(&mut encrypted_symmetric_key_path)?;
-            let encrypted_symmetric_key_path = encrypted_symmetric_key_path.trim();   
+        // Read the secret key path
+        let mut encrypted_symmetric_key_path = String::new();
+        io::stdin().read_line(&mut encrypted_symmetric_key_path)?;
+        let encrypted_symmetric_key_path = encrypted_symmetric_key_path.trim();   
 
-            // read in encrypted symmetric key  
-            let encrypted_symmetric_key = fs::read(encrypted_symmetric_key_path)?;
+        // read in encrypted symmetric key  
+        let encrypted_symmetric_key = fs::read(encrypted_symmetric_key_path)?;
 
-            //decrypt the message
-            message_decryption(&private_key, &encrypted_symmetric_key, &nonce, &encrypted_text)?;
-            Ok(())
-        }
-        "n" | "no" => {
-            // do nothing, just continue
-            Ok(())
-        }
-        _ => {
-            println!("Invalid input, please enter y/n");
-            Ok(())
-        }
-    }
+        //decrypt the message
+        message_decryption(&private_key, &encrypted_symmetric_key, &nonce, &encrypted_text)?;
+        Ok(())
 }
