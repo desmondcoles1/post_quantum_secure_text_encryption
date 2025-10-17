@@ -16,4 +16,4 @@ Download the rust project and build it locally. There are three commands key-gen
 This is a personal project I embarked on to practice rust and to explore the liboqs library, and as such this application has not recieved extensive vulnerability testing. I would not use this for my bank information, but hey you do you.
 
 #### Future improvement
-The biggest security priority is managing the sensitive information like keys, in particular making sure that any sensitive information would not be available if the application crashed, and that secret keys should be not written into loosely permissioned folders. For the user end it would be good to add options to name files when writing and to specify their locations.
+The biggest security priority is managing the sensitive information like keys, in particular making sure that any sensitive information would not be available if the application crashed, and that secret keys should be not written with loose permissions. For the user end it would be good to add options to name files when writing and to specify their locations.
