@@ -1,6 +1,8 @@
 use std::fs;
 use std::io::{self, Write};
 
+use std::path::Path;
+
 use oqs::*;
 
 
@@ -28,10 +30,28 @@ pub fn message_decryption(private_key: &[u8], encrypted_symmetric_key: &[u8], no
     let aes_cipher = Aes256Gcm::new_from_slice(&secret_aes_key_in_bytes)?;
 
     let nonce_in_bytes: &[u8] = nonce.as_ref();
-    let nonce = aes_gcm::Nonce::from_slice(&nonce_in_bytes); // &Nonce
+    let nonce = aes_gcm::Nonce::from_slice(&nonce_in_bytes); 
 
     let decrypted_bytes: Vec<u8> = aes_cipher.decrypt(nonce, encrypted_text.as_ref())
         .map_err(|_| CryptoError::LiboqsErrorWMessage("encrypted file is malformed".into()))?;
+
+    let output_path = "../decrypted_text.txt";
+    let file_path = Path::new(output_path);
+
+    // Check if file exists
+    if file_path.exists() {
+        print!("Warning: '{}' already exists. Overwrite? (y/N): ", output_path);
+        io::stdout().flush().map_err(|_| CryptoError::FileWriteError("Failed to flush stdout".into()))?;
+
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).map_err(|_| CryptoError::FileReadError("Failed to read input".into()))?;
+        let input = input.trim().to_lowercase();
+
+        if input != "y" && input != "yes" {
+            println!("Aborting write to '{}'", output_path);
+            return Ok(()); // Do not overwrite
+        }
+    }
 
     fs::write("../decrypted_text.txt", &decrypted_bytes)
         .map_err(|_| CryptoError::FileWriteError("Failed to write decrypted file".into()))?;
@@ -60,7 +80,7 @@ pub fn file_decryption_prompt() -> std::result::Result<(), CryptoError>{
         let (nonce, encrypted_text) = encrypted_message.split_at(12);
 
         // Prompt user
-        print!("Paste the path to your private key");
+        print!("Paste the path to your private key: ");
         io::stdout().flush()?;
 
         // Read key path

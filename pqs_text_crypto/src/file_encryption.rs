@@ -1,6 +1,8 @@
 use std::fs;
 use std::io::{self, Write};
 
+use std::path::Path;
+
 use oqs::*;
 
 use aes_gcm::{
@@ -34,10 +36,46 @@ pub fn message_encryption(recipient_public_key: &[u8], text: &[u8]) -> std::resu
 
     let mut encrypted_message = Vec::with_capacity(nonce.len() + encrypted_text_raw.len());
     encrypted_message.extend_from_slice(&nonce);          
-    encrypted_message.extend_from_slice(&encrypted_text_raw); 
+    encrypted_message.extend_from_slice(&encrypted_text_raw);
+
+    let output_path = "../enecrypted_message.bin";
+    let file_path = Path::new(output_path);
+
+    // Check if file exists
+    if file_path.exists() {
+        print!("Warning: '{}' already exists. Overwrite? (y/N): ", output_path);
+        io::stdout().flush().map_err(|_| CryptoError::FileWriteError("Failed to flush stdout".into()))?;
+
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).map_err(|_| CryptoError::FileReadError("Failed to read input".into()))?;
+        let input = input.trim().to_lowercase();
+
+        if input != "y" && input != "yes" {
+            println!("Aborting write to '{}'", output_path);
+            return Ok(()); // Do not overwrite
+        }
+    }
   
     fs::write("../enecrypted_message.bin", &encrypted_message)
         .map_err(|_| CryptoError::FileWriteError("Failed to encrypted message".into()))?;
+
+    let output_path = "../encrypted_secret_symmetric_key.bin";
+    let file_path = Path::new(output_path);
+
+    // Check if file exists
+    if file_path.exists() {
+        print!("Warning: '{}' already exists. Overwrite? (y/N): ", output_path);
+        io::stdout().flush().map_err(|_| CryptoError::FileWriteError("Failed to flush stdout".into()))?;
+
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).map_err(|_| CryptoError::FileReadError("Failed to read input".into()))?;
+        let input = input.trim().to_lowercase();
+
+        if input != "y" && input != "yes" {
+            println!("Aborting write to '{}'", output_path);
+            return Ok(()); // Do not overwrite
+        }
+    }
 
     fs::write("../encrypted_secret_symmetric_key.bin", &encrypted_secret_symmetric_key)
         .map_err(|_| CryptoError::FileWriteError("Failed to write encrypted secret symmetric key".into()))?;
