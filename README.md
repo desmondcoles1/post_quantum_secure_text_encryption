@@ -6,9 +6,12 @@ At present most public key cryptography relies on the computational hardness of 
 
 This repositiory contains a rust program that will encrypt a text file using AES256 encryption and encapsulate the key with a post-quantum secure algorithm sourced from the liboqs library. The rust program will allow you to generate a private and public key pair, it will allow you encrypt a text file, or decrypted a message you have recieved.
 
-This program requires the [liboqs](https://github.com/open-quantum-safe/liboqs) library, see their github for installation instructions.
+This program relies on the [liboqs](https://github.com/open-quantum-safe/liboqs) library, see their github for more information.
 
-Upon running the program you will be asked if you want to generate keypair, encrypt a file, or decrypt a file. Answering no to one prompt takes you to the next option, answering no to all three closes the program. Files are written to the root folder of the repository.
 
-This is a personal project I embarked on to practice rust and to explore the liboqs library. I would not use this for my bank information, but hey you do you.
+### Installation and usage
+Download the rust project and build it locally. There are three commands key-generation, encrypt, and decrypt, to generate public and private keys, encrypt files, and decrypt them. These can be run by cding into the root directory and running "cargo run -- key-generation" for example. Keys, encrypted files, and decrypted files will be written to the directory containing the rust project.
+
+### Note from author
+This is a personal project I embarked on to practice rust and to explore the liboqs library, and as such this application has not recieved extensive vulnerability testing. I would not use this for my bank information, but hey you do you.
 
