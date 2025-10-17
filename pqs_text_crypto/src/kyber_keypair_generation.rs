@@ -11,8 +11,10 @@ pub fn generate_kyber_keys() -> std::result::Result<(), CryptoError>{
     let (public_key, secret_key) = kem.keypair()?;
 
     // Write keys to files one folder above project (panic if fails)
-    fs::write("../public_key.bin", &public_key)?;
-    fs::write("../private_key.bin", &secret_key)?;
+    fs::write("../public_key.bin", &public_key)
+        .map_err(|_| CryptoError::FileWriteError("Failed to write public key".into()))?;
+    fs::write("../private_key.bin", &secret_key)
+        .map_err(|_| CryptoError::FileWriteError("Failed to write private key".into()))?;
 
     Ok(())
 }
