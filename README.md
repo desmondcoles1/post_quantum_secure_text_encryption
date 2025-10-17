@@ -9,9 +9,11 @@ This repositiory contains a rust program that will encrypt a text file using AES
 This program relies on the [liboqs](https://github.com/open-quantum-safe/liboqs) library, see their github for more information.
 
 
-### Installation and usage
+## Installation and usage
 Download the rust project and build it locally. There are three commands key-generation, encrypt, and decrypt, to generate public and private keys, encrypt files, and decrypt them. These can be run by cding into the root directory and running "cargo run -- key-generation" for example. Keys, encrypted files, and decrypted files will be written to the directory containing the rust project.
 
-### Note from author
+#### Note from author
 This is a personal project I embarked on to practice rust and to explore the liboqs library, and as such this application has not recieved extensive vulnerability testing. I would not use this for my bank information, but hey you do you.
 
+#### Future improvement
+The biggest security priority is managing the sensitive information like keys, in particular making sure that any sensitive information would not be available if the application crashed, and that secret keys should be not written into loosely permissioned folders. For the user end it would be good to add options to name files when writing and to specify their locations.
